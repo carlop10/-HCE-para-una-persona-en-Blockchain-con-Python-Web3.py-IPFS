@@ -16,7 +16,10 @@ import hashlib
 import argparse
 from dataclasses import dataclass
 from decimal import Decimal
-
+from web3 import Web3
+from eth_account import Account
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 from dotenv import load_dotenv
 try:
     # Web3.py v7 o superior
@@ -24,13 +27,6 @@ try:
 except ImportError:
     # Web3.py v6 o inferior
     from web3.middleware import geth_poa_middleware
-
-import requests
-from web3 import Web3
-from eth_account import Account
-
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
 
 # ---------- Config / carga .env ----------
 load_dotenv()
@@ -277,7 +273,7 @@ def menu():
         print("\nOpciones:")
         print("1) Probar cifrado local y subida simulada a IPFS")
         print("2) Registrar evento clínico (dry-run)")
-        print("3) Registrar evento clínico (enviar tx real) -- cuidado")
+        print("3) Registrar evento clínico (enviar tx real)")
         print("4) Probar decrypt roundtrip")
         print("0) Salir")
         opt = input("Seleccione opción: ").strip()

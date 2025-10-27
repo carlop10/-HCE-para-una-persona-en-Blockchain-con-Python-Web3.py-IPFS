@@ -65,24 +65,69 @@ contract HCE_Registro {
     struct Evento {
         string patientId;
         string eventType;
-        string ipfsCid;
         string detailHash;
+        string attachmentCid;
+        uint256 version;
         uint256 timestamp;
     }
 
-    Evento[] public eventos;
+    struct Consentimiento {
+        bool estado;
+        string evidenciaHash;
+        string evidenciaCid;
+        uint256 timestamp;
+    }
+
+    mapping(string => Evento[]) private eventos;
+    mapping(string => Consentimiento) private consentimientos;
+
+    event EventoRegistrado(string indexed patientId, string eventType, string cid, uint256 version);
+    event ConsentimientoActualizado(string indexed patientId, bool estado);
 
     function registrarEvento(
         string memory patientId,
         string memory eventType,
-        string memory ipfsCid,
-        string memory detailHash
+        string memory detailHash,
+        string memory attachmentCid,
+        uint256 version
     ) public {
-        eventos.push(Evento(patientId, eventType, ipfsCid, detailHash, block.timestamp));
+        Evento memory nuevo = Evento({
+            patientId: patientId,
+            eventType: eventType,
+            detailHash: detailHash,
+            attachmentCid: attachmentCid,
+            version: version,
+            timestamp: block.timestamp
+        });
+        eventos[patientId].push(nuevo);
+        emit EventoRegistrado(patientId, eventType, attachmentCid, version);
     }
 
-    function totalEventos() public view returns (uint256) {
-        return eventos.length;
+    function actualizarConsentimiento(
+        string memory patientId,
+        bool estado,
+        string memory evidenciaHash,
+        string memory evidenciaCid
+    ) public {
+        consentimientos[patientId] = Consentimiento({
+            estado: estado,
+            evidenciaHash: evidenciaHash,
+            evidenciaCid: evidenciaCid,
+            timestamp: block.timestamp
+        });
+        emit ConsentimientoActualizado(patientId, estado);
+    }
+
+    function obtenerEventos(string memory patientId) public view returns (Evento[] memory) {
+        return eventos[patientId];
+    }
+
+    function obtenerConsentimiento(string memory patientId) public view returns (Consentimiento memory) {
+        return consentimientos[patientId];
+    }
+
+    function totalEventos(string memory patientId) public view returns (uint256) {
+        return eventos[patientId].length;
     }
 }
 ```
